@@ -43,7 +43,7 @@ def check_repository(path, length: nil)
 
   messages.join "\n" if messages
 
-  if update_response.match(/error/)
+  if update_response.match(/error:|fatal:/)
     messages = [
       "#{path.rjust length} ERROR:",
       update_response,
