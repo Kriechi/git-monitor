@@ -31,7 +31,7 @@ def check_repository(path, length: nil)
   branches ||= ['master']
 
   branches.each do |branch|
-    next unless update_response.match(/[[:alnum:]]+..[[:alnum:]]+\s+#{branch}/)
+    next unless update_response.match(/[[:alnum:]]+..[[:alnum:]]+\s+#{branch}\s+/)
 
     url = `cd #{full_path} && git remote show origin`.match(/Fetch URL: (.*)/) do |m|
       " #{m[1]}"
