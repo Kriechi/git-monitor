@@ -1,0 +1,13 @@
+GEM
+  remote: https://rubygems.org/
+  specs:
+    pmap (1.1.1)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  pmap
+
+BUNDLED WITH
+   1.11.2
