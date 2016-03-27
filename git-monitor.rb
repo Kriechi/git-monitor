@@ -9,7 +9,7 @@ def list_respositories
 end
 
 def add_repository(url)
-  path = url.match(%r{.*/(.*).git})[1]
+  path = url.match(%r{.+/(.+).git})[1]
 
   Dir.chdir GIT_MONITOR_PREFIX do
     `git clone --depth 1 --quiet --no-single-branch --no-checkout #{url}`
@@ -31,19 +31,26 @@ def check_repository(path, length: nil)
   branches ||= ['master']
 
   branches.each do |branch|
-    next unless update_response.match(/[[:alnum:]]+..[[:alnum:]]+\s+#{branch}\s+/)
+    next unless update_response =~ /[[:alnum:]]+..[[:alnum:]]+\s+#{branch}\s+/
 
-    url = `cd #{full_path} && git remote show origin`.match(/Fetch URL: (.*)/) do |m|
+    remotes = `cd #{full_path} && git remote show origin`
+    url = remotes.match(/Fetch URL: (.+)/) do |m|
       " #{m[1]}"
     end
 
+    if url
+      url.gsub!('.git', "/commits/#{branch}")
+    else
+      url = '<unable to get url>'
+    end
+
     messages ||= []
-    messages << "#{path.rjust length} on #{branch}: " + 'CHANGED'.rjust(7) + (url || '<unable to get url>')
+    messages << "#{path.rjust length} on #{branch}: " + 'CHANGED'.rjust(7) + url
   end
 
   messages.join "\n" if messages
 
-  if update_response.match(/error:|fatal:/)
+  if update_response =~ /error:|fatal:/
     messages = [
       "#{path.rjust length} ERROR:",
       update_response,
@@ -59,7 +66,7 @@ def check_repositories
   length = repos.map(&:length).max
   changes = repos.pmap { |repo| check_repository repo, length: length }.compact
 
-  if changes.length == 0
+  if changes.empty?
     puts 'Already up-to-date.'
   else
     puts changes.join "\n"
