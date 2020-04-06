@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"os"
 	"os/exec"
@@ -10,6 +11,7 @@ import (
 	"runtime"
 	"strings"
 
+	"github.com/go-git/go-git/v5"
 	"github.com/olekukonko/tablewriter"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -55,11 +57,12 @@ func runCheck(cmd *cobra.Command, args []string) {
 	var resultList [][]string
 	for a := 1; a <= len(repos); a++ {
 		result := <-results
-		if len(result.ChangedBranches) > 0 {
-			for _, branch := range result.ChangedBranches {
-				resultList = append(resultList, []string{result.Name, branch, "http://"})
-			}
+
+		entries, err := formatResult(result)
+		if err != nil {
+			continue
 		}
+		resultList = append(resultList, entries...)
 	}
 
 	if len(resultList) == 0 {
@@ -71,6 +74,46 @@ func runCheck(cmd *cobra.Command, args []string) {
 		table.AppendBulk(resultList)
 		table.Render()
 	}
+}
+
+func formatResult(result RepoToCheck) ([][]string, error) {
+	var resultList [][]string
+	if len(result.ChangedBranches) > 0 {
+		gitRepo, err := git.PlainOpen(result.Path)
+		if err != nil {
+			fmt.Fprintln(os.Stderr, "ERROR: failed to open git repository:", result.Name, err)
+			return nil, errors.New("failed to open git repository")
+		}
+		remotes, err := gitRepo.Remotes()
+		if err != nil || len(remotes) == 0 {
+			fmt.Fprintln(os.Stderr, "ERROR: failed to get remotes from git repository:", result.Name, err)
+			return nil, errors.New("failed to get remotes from git repository")
+		}
+
+		baseURL := remotes[0].Config().URLs[0]
+
+		for _, branch := range result.ChangedBranches {
+			url := baseURL
+			if strings.Contains(url, "github.com") {
+				// https://github.com/<username>/<reponame>.git
+				url = strings.TrimSuffix(url, ".git") + "/commits/" + branch
+			} else if strings.Contains(url, "gitlab.com") {
+				// https://gitlab.com/<username>/<reponame>/-/commits/master
+				url = strings.TrimSuffix(url, ".git") + "/-/commits/" + branch
+			} else if strings.Contains(url, "bitbucket.com") {
+				// https://bitbucket.org/<username>/<reponame>/commits/branch/hg-crew-tip
+				url = strings.TrimSuffix(url, ".git") + "/commits/branch/" + branch
+			}
+			if strings.HasPrefix(url, "git@") {
+				// git@github.com:<username>/<reponame>.git
+				url = "https://" + strings.TrimPrefix(url, "git@")
+				url = strings.Replace(url, ":", "/", 1)
+			}
+
+			resultList = append(resultList, []string{result.Name, branch, url})
+		}
+	}
+	return resultList, nil
 }
 
 // RepoToCheck contains input and output data
