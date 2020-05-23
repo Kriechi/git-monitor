@@ -25,8 +25,6 @@ func init() {
 }
 
 func runAdd(cmd *cobra.Command, args []string) {
-	fmt.Println("add called")
-
 	repoDir := viper.GetString("repo_dir")
 
 	url := args[0]
@@ -35,12 +33,7 @@ func runAdd(cmd *cobra.Command, args []string) {
 	if len(args) == 2 {
 		targetDir = args[1]
 	} else {
-		// based on https://github.com/git/git/blob/90bbd502d54fe920356fa9278055dc9c9bfe9a56/contrib/examples/git-clone.sh#L231-L232
-		targetDir = url // just to get started
-		targetDir = strings.TrimSpace(targetDir)
-		targetDir = strings.TrimSuffix(targetDir, "/")
-		targetDir = regexp.MustCompile(`:*/*\.git`).ReplaceAllString(targetDir, "")
-		targetDir = regexp.MustCompile(`.*[/:]`).ReplaceAllString(targetDir, "")
+		targetDir = extractHumanishRepoName(url)
 	}
 
 	path := filepath.Join(repoDir, targetDir)
@@ -55,4 +48,14 @@ func runAdd(cmd *cobra.Command, args []string) {
 		os.Exit(1)
 	}
 	fmt.Printf("Added repository for monitoring from %s as %s.\n", url, targetDir)
+}
+
+func extractHumanishRepoName(url string) string {
+	// based on https://github.com/git/git/blob/90bbd502d54fe920356fa9278055dc9c9bfe9a56/contrib/examples/git-clone.sh#L231-L232
+	targetDir := url // just to get started
+	targetDir = strings.TrimSpace(targetDir)
+	targetDir = strings.TrimSuffix(targetDir, "/")
+	targetDir = regexp.MustCompile(`:*/*\.git`).ReplaceAllString(targetDir, "")
+	targetDir = regexp.MustCompile(`.*[/:]`).ReplaceAllString(targetDir, "")
+	return targetDir
 }

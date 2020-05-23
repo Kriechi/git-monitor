@@ -41,23 +41,7 @@ func runList(cmd *cobra.Command, args []string) {
 			continue
 		}
 
-		var branchList []string
-		branchFile := filepath.Join(repoDir, repo, ".git-monitor-branches")
-		if _, err := os.Stat(branchFile); err == nil {
-			byts, err := ioutil.ReadFile(branchFile)
-			if err == nil {
-				content := strings.Replace(string(byts), "\r\n", "\n", -1)
-				for _, branch := range strings.Split(content, "\n") {
-					branch = strings.TrimSpace(branch)
-					if len(branch) > 0 {
-						branchList = append(branchList, branch)
-					}
-				}
-			}
-		} else {
-			branchList = []string{"master"}
-		}
-
+		branchList := parseMonitoredBranches(repo)
 		branches := strings.Join(branchList, ", ")
 
 		for _, remote := range remotes {
@@ -67,6 +51,32 @@ func runList(cmd *cobra.Command, args []string) {
 		}
 	}
 
+	printListResults(repoList)
+}
+
+func parseMonitoredBranches(repo string) []string {
+	repoDir := viper.GetString("repo_dir")
+
+	var branchList []string
+	branchFile := filepath.Join(repoDir, repo, ".git-monitor-branches")
+	if _, err := os.Stat(branchFile); err == nil {
+		byts, err := ioutil.ReadFile(branchFile)
+		if err == nil {
+			content := strings.Replace(string(byts), "\r\n", "\n", -1)
+			for _, branch := range strings.Split(content, "\n") {
+				branch = strings.TrimSpace(branch)
+				if len(branch) > 0 {
+					branchList = append(branchList, branch)
+				}
+			}
+		}
+	} else {
+		branchList = []string{"master"}
+	}
+	return branchList
+}
+
+func printListResults(repoList [][]string) {
 	table := tablewriter.NewWriter(os.Stdout)
 	table.SetHeader([]string{"Repository", "Remote URL", "Monitored Branches"})
 	table.SetBorder(false)

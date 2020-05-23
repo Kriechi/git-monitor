@@ -27,7 +27,8 @@ you that repository X on branch Y has new commits.`,
 }
 
 // Execute of the root command is our main entry point.
-func Execute() {
+func Execute(version string) {
+	rootCmd.Version = version
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Println(err)
 		os.Exit(1)

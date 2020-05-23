@@ -45,7 +45,6 @@ func runCheck(cmd *cobra.Command, args []string) {
 	for w := 1; w <= numWorkers; w++ {
 		go worker(reposToCheck, results)
 	}
-
 	for _, repo := range repos {
 		reposToCheck <- RepoToCheck{
 			Name: repo,
@@ -54,6 +53,11 @@ func runCheck(cmd *cobra.Command, args []string) {
 	}
 	close(reposToCheck)
 
+	resultList := formatResults(repos, results)
+	printCheckResults(resultList)
+}
+
+func formatResults(repos []string, results chan RepoToCheck) [][]string {
 	var resultList [][]string
 	for a := 1; a <= len(repos); a++ {
 		result := <-results
@@ -64,16 +68,7 @@ func runCheck(cmd *cobra.Command, args []string) {
 		}
 		resultList = append(resultList, entries...)
 	}
-
-	if len(resultList) == 0 {
-		fmt.Println("Already up-to-date.")
-	} else {
-		table := tablewriter.NewWriter(os.Stdout)
-		table.SetHeader([]string{"Repository", "Changed Branch", "Remote URL"})
-		table.SetBorder(false)
-		table.AppendBulk(resultList)
-		table.Render()
-	}
+	return resultList
 }
 
 func formatResult(result RepoToCheck) ([][]string, error) {
@@ -106,14 +101,26 @@ func formatResult(result RepoToCheck) ([][]string, error) {
 			}
 			if strings.HasPrefix(url, "git@") {
 				// git@github.com:<username>/<reponame>.git
-				url = "https://" + strings.TrimPrefix(url, "git@")
 				url = strings.Replace(url, ":", "/", 1)
+				url = "https://" + strings.TrimPrefix(url, "git@")
 			}
 
 			resultList = append(resultList, []string{result.Name, branch, url})
 		}
 	}
 	return resultList, nil
+}
+
+func printCheckResults(resultList [][]string) {
+	if len(resultList) == 0 {
+		fmt.Println("Already up-to-date.")
+	} else {
+		table := tablewriter.NewWriter(os.Stdout)
+		table.SetHeader([]string{"Repository", "Changed Branch", "Remote URL"})
+		table.SetBorder(false)
+		table.AppendBulk(resultList)
+		table.Render()
+	}
 }
 
 // RepoToCheck contains input and output data
