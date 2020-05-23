@@ -4,6 +4,14 @@ Monitor Git repositories for new commits.
 On each run the remote is fetched and compared to the local state. If anything
 has changed (new commits) an information line for this repository is given.
 
+A common activities of most developers and IT enthusiasts is a daily `apt-get
+update` (or similar) to check for new software package updates. Some even
+perform a `brew update` or `npm update` to always get the bleeding edge of new
+releases. Some software is only available on GitHub, Gitlab, or other git-based
+hosting platforms without direct integration into package manager. `git-monitor`
+helps you to say on top on things and get notified about new commits and changes
+in repositories and their branches.
+
 All repositories are fetched without a local checkout into
 `~/.git-monitor/<repo>`.
 
