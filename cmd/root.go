@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/spf13/cobra"
 
@@ -111,6 +112,13 @@ func initConfig() {
 	}
 	if viper.GetBool("verbose") {
 		fmt.Println("Using repo_dir:", repoDir)
+	}
+
+	if viper.GetBool("verbose") {
+		ignoredBranches := viper.GetStringSlice("ignored_branches")
+		if len(ignoredBranches) > 0 {
+			fmt.Println("Ignoring all changes on branches:", strings.Join(ignoredBranches, ", "))
+		}
 	}
 }
 

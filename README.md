@@ -13,7 +13,7 @@ helps you to say on top on things and get notified about new commits and changes
 in repositories and their branches.
 
 All repositories are fetched without a local checkout into
-`~/.git-monitor/<repo>`.
+`~/.git-monitor/<repo>` (unless `repo_dir` is configured otherwise).
 
 ## Install
 
@@ -49,4 +49,16 @@ Flags:
   -v, --verbose           enable verbose output
 
 Use "git-monitor [command] --help" for more information about a command.
+```
+
+# Configuration
+
+You can use this YAML configuration file and save it to `~/.git-monitor.yaml`
+(or use `--config` to override):
+```yaml
+verbose: true
+repo_dir: ~/.my_repos_to_track
+ignored_branches:
+  - requires-io-master
+  - some-other-branch-to-ignore
 ```

@@ -87,7 +87,19 @@ func formatResult(result RepoToCheck) ([][]string, error) {
 
 		baseURL := remotes[0].Config().URLs[0]
 
+		ignoredBranches := viper.GetStringSlice("ignored_branches")
 		for _, branch := range result.ChangedBranches {
+			skip := false
+			for _, b := range ignoredBranches {
+				if branch == b {
+					skip = true
+					break
+				}
+			}
+			if skip {
+				continue
+			}
+
 			url := baseURL
 			if strings.Contains(url, "github.com") {
 				// https://github.com/<username>/<reponame>.git
