@@ -20,10 +20,6 @@ var listCmd = &cobra.Command{
 	Run:   runList,
 }
 
-func init() {
-	rootCmd.AddCommand(listCmd)
-}
-
 func runList(cmd *cobra.Command, args []string) {
 	repoDir := viper.GetString("repo_dir")
 	var repoList [][]string

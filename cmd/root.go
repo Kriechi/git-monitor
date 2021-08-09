@@ -15,16 +15,28 @@ import (
 var cfgFile string
 
 // rootCmd represents the base command when called without any subcommands
-var rootCmd = &cobra.Command{
-	Use:   "git-monitor",
-	Short: "git-monitor keeps track of changes in monitored git repositories",
-	Long: `git-monitor manages a list of git repositories and can check them for new
+var rootCmd *cobra.Command = newRootCmd()
+
+func newRootCmd() *cobra.Command {
+	r := &cobra.Command{
+		Use:   "git-monitor",
+		Short: "git-monitor keeps track of changes in monitored git repositories",
+		Long: `
+git-monitor manages a list of git repositories and can check them for new
 commits or changes on branches. It works against local and remote repositories.
 
 git-monitor is a CLI application which can tell you if a repository has changes
 since the last time you checked it. Think of it as "apt-get update" which tells
 you that repository X on branch Y has new commits.`,
-	Run: runRoot,
+		Run: runRoot,
+	}
+
+	r.AddCommand(addCmd)
+	r.AddCommand(checkCmd)
+	r.AddCommand(listCmd)
+	r.AddCommand(removeCmd)
+
+	return r
 }
 
 // Execute of the root command is our main entry point.

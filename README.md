@@ -4,7 +4,7 @@ Monitor Git repositories for new commits.
 On each run the remote is fetched and compared to the local state. If anything
 has changed (new commits) an information line for this repository is given.
 
-A common activities of most developers and IT enthusiasts is a daily `apt-get
+A common activity of most developers and IT enthusiasts is a daily `apt-get
 update` (or similar) to check for new software package updates. Some even
 perform a `brew update` or `npm update` to always get the bleeding edge of new
 releases. Some software is only available on GitHub, Gitlab, or other git-based
@@ -19,6 +19,11 @@ All repositories are fetched without a local checkout into
 
 ```console
 go get github.com/kriechi/git-monitor
+```
+
+To get the `BuildDate` timestamp in the `git-monitor --version` set correctly:
+```console
+go install -ldflags "-X main.BuildDate=$(date +'%Y-%m-%dT%H:%M:%S%z')"
 ```
 
 ## Usage
@@ -38,6 +43,7 @@ Usage:
 Available Commands:
   add         Add a new repository with a local clone
   check       Check all monitored repositories for changes, or only the ones passed as argument
+  completion  generate the autocompletion script for the specified shell
   help        Help about any command
   list        List all monitored repositories
   remove      Remove a monitored repository
@@ -47,6 +53,7 @@ Flags:
   -h, --help              help for git-monitor
       --repo_dir string   directory where to store local repositories
   -v, --verbose           enable verbose output
+      --version           version for git-monitor
 
 Use "git-monitor [command] --help" for more information about a command.
 ```

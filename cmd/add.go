@@ -20,10 +20,6 @@ var addCmd = &cobra.Command{
 	Run:   runAdd,
 }
 
-func init() {
-	rootCmd.AddCommand(addCmd)
-}
-
 func runAdd(cmd *cobra.Command, args []string) {
 	repoDir := viper.GetString("repo_dir")
 

@@ -24,10 +24,6 @@ var checkCmd = &cobra.Command{
 	Run:   runCheck,
 }
 
-func init() {
-	rootCmd.AddCommand(checkCmd)
-}
-
 func runCheck(cmd *cobra.Command, args []string) {
 	var repos []string
 	repoDir := viper.GetString("repo_dir")

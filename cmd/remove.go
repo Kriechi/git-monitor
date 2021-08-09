@@ -13,14 +13,11 @@ var removeCmd = &cobra.Command{
 	Use:     "remove",
 	Aliases: []string{"delete"},
 	Short:   "Remove a monitored repository",
-	Long: `This command removes a repository from the list of monitored repositories.
-	It deletes the local checkout and cleans up any references to this repository.`,
+	Long: `
+This command removes a repository from the list of monitored repositories.
+It deletes the local checkout and cleans up any references to this repository.`,
 	Args: cobra.ExactArgs(1),
 	Run:  runRemove,
-}
-
-func init() {
-	rootCmd.AddCommand(removeCmd)
 }
 
 func runRemove(cmd *cobra.Command, args []string) {

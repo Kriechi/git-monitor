@@ -15,7 +15,7 @@ func main() {
 var VersionSuffix = "-dev"
 
 // CurrentVersion represents the current build version.
-var CurrentVersion = "0.0.1" + VersionSuffix
+var CurrentVersion = "0.0.2" + VersionSuffix
 
 // BuildDate is a human-readable timestamp of when this binary was built.
 var BuildDate = "2006-01-02T15:04:05Z-0700" // dummy timestamp
