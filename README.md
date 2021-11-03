@@ -1,4 +1,5 @@
 # git-monitor
+
 Monitor Git repositories for new commits.
 
 On each run the remote is fetched and compared to the local state. If anything
@@ -22,6 +23,7 @@ go get github.com/kriechi/git-monitor
 ```
 
 To get the `BuildDate` timestamp in the `git-monitor --version` set correctly:
+
 ```console
 go install -ldflags "-X main.BuildDate=$(date +'%Y-%m-%dT%H:%M:%S%z')"
 ```
@@ -51,6 +53,7 @@ Available Commands:
 Flags:
       --config string     config file (default is $HOME/.git-monitor.yaml)
   -h, --help              help for git-monitor
+  -b, --open_in_browser   open the URL of each repository change in your browser
       --repo_dir string   directory where to store local repositories
   -v, --verbose           enable verbose output
       --version           version for git-monitor
@@ -58,12 +61,14 @@ Flags:
 Use "git-monitor [command] --help" for more information about a command.
 ```
 
-# Configuration
+## Configuration
 
 You can use this YAML configuration file and save it to `~/.git-monitor.yaml`
 (or use `--config` to override):
+
 ```yaml
 verbose: true
+open_in_browser: true
 repo_dir: ~/.my_repos_to_track
 ignored_branches:
   - requires-io-master

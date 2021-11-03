@@ -56,6 +56,9 @@ func init() {
 	rootCmd.PersistentFlags().BoolP("verbose", "v", false, "enable verbose output")
 	viper.BindPFlag("verbose", rootCmd.PersistentFlags().Lookup("verbose"))
 
+	rootCmd.PersistentFlags().BoolP("open_in_browser", "b", false, "open the URL of each repository change in your browser")
+	viper.BindPFlag("open_in_browser", rootCmd.PersistentFlags().Lookup("open_in_browser"))
+
 	rootCmd.PersistentFlags().String("repo_dir", "", "directory where to store local repositories")
 	viper.BindPFlag("repo_dir", rootCmd.PersistentFlags().Lookup("repo_dir"))
 	viper.SetDefault("repo_dir", "~/.git-monitor")

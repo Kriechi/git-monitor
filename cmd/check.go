@@ -13,6 +13,7 @@ import (
 
 	"github.com/go-git/go-git/v5"
 	"github.com/olekukonko/tablewriter"
+	"github.com/pkg/browser"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -111,6 +112,10 @@ func formatResult(result RepoToCheck) ([][]string, error) {
 				// git@github.com:<username>/<reponame>.git
 				url = strings.Replace(url, ":", "/", 1)
 				url = "https://" + strings.TrimPrefix(url, "git@")
+			}
+
+			if viper.GetBool("open_in_browser") {
+				browser.OpenURL(url)
 			}
 
 			resultList = append(resultList, []string{result.Name, branch, url})
