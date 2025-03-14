@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -56,7 +55,7 @@ func parseMonitoredBranches(repo string) []string {
 	var branchList []string
 	branchFile := filepath.Join(repoDir, repo, ".git-monitor-branches")
 	if _, err := os.Stat(branchFile); err == nil {
-		byts, err := ioutil.ReadFile(branchFile)
+		byts, err := os.ReadFile(branchFile)
 		if err == nil {
 			content := strings.Replace(string(byts), "\r\n", "\n", -1)
 			for _, branch := range strings.Split(content, "\n") {
@@ -73,7 +72,7 @@ func parseMonitoredBranches(repo string) []string {
 }
 
 func printListResults(repoList [][]string) {
-	table := tablewriter.NewWriter(os.Stdout)
+	table := tablewriter.NewWriter(outWriter)
 	table.SetHeader([]string{"Repository", "Remote URL", "Monitored Branches"})
 	table.SetBorder(false)
 	table.AppendBulk(repoList)

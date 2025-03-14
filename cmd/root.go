@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 	"strings"
@@ -14,10 +15,12 @@ import (
 
 var cfgFile string
 
-// rootCmd represents the base command when called without any subcommands
-var rootCmd *cobra.Command = newRootCmd()
+var outWriter io.Writer
 
-func newRootCmd() *cobra.Command {
+// rootCmd represents the base command when called without any subcommands
+var rootCmd *cobra.Command = newRootCmd(os.Stdout)
+
+func newRootCmd(w io.Writer) *cobra.Command {
 	r := &cobra.Command{
 		Use:   "git-monitor",
 		Short: "git-monitor keeps track of changes in monitored git repositories",
@@ -31,10 +34,24 @@ you that repository X on branch Y has new commits.`,
 		Run: runRoot,
 	}
 
+	r.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.git-monitor.yaml)")
+
+	r.PersistentFlags().BoolP("verbose", "v", false, "enable verbose output")
+	viper.BindPFlag("verbose", r.PersistentFlags().Lookup("verbose"))
+
+	r.PersistentFlags().BoolP("open_in_browser", "b", false, "open the URL of each repository change in your browser")
+	viper.BindPFlag("open_in_browser", r.PersistentFlags().Lookup("open_in_browser"))
+
+	r.PersistentFlags().String("repo_dir", "", "directory where to store local repositories")
+	viper.BindPFlag("repo_dir", r.PersistentFlags().Lookup("repo_dir"))
+	viper.SetDefault("repo_dir", "~/.git-monitor")
+
 	r.AddCommand(addCmd)
 	r.AddCommand(checkCmd)
 	r.AddCommand(listCmd)
 	r.AddCommand(removeCmd)
+
+	outWriter = w
 
 	return r
 }
@@ -50,18 +67,6 @@ func Execute(version string) {
 
 func init() {
 	cobra.OnInitialize(initConfig)
-
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.git-monitor.yaml)")
-
-	rootCmd.PersistentFlags().BoolP("verbose", "v", false, "enable verbose output")
-	viper.BindPFlag("verbose", rootCmd.PersistentFlags().Lookup("verbose"))
-
-	rootCmd.PersistentFlags().BoolP("open_in_browser", "b", false, "open the URL of each repository change in your browser")
-	viper.BindPFlag("open_in_browser", rootCmd.PersistentFlags().Lookup("open_in_browser"))
-
-	rootCmd.PersistentFlags().String("repo_dir", "", "directory where to store local repositories")
-	viper.BindPFlag("repo_dir", rootCmd.PersistentFlags().Lookup("repo_dir"))
-	viper.SetDefault("repo_dir", "~/.git-monitor")
 }
 
 // initConfig reads in config file and ENV variables if set.

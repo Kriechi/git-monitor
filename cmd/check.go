@@ -128,7 +128,7 @@ func printCheckResults(resultList [][]string) {
 	if len(resultList) == 0 {
 		fmt.Println("Already up-to-date.")
 	} else {
-		table := tablewriter.NewWriter(os.Stdout)
+		table := tablewriter.NewWriter(outWriter)
 		table.SetHeader([]string{"Repository", "Changed Branch", "Remote URL"})
 		table.SetBorder(false)
 		table.AppendBulk(resultList)

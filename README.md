@@ -74,3 +74,9 @@ ignored_branches:
   - requires-io-master
   - some-other-branch-to-ignore
 ```
+
+## Development Testing
+
+```sh
+go test ./...
+```
